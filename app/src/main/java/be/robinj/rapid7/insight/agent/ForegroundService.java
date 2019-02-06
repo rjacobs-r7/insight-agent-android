@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -24,7 +23,7 @@ import be.robinj.rapid7.insight.agent.listener.EventListener;
 public class ForegroundService extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
-		throw new UnsupportedOperationException();
+		return null;
 	}
 
 	@Override
@@ -34,7 +33,7 @@ public class ForegroundService extends Service {
 	}
 
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
+	public int onStartCommand(final Intent intent, final int flags, final int startId) {
 		if (intent == null) {
 			return super.onStartCommand(intent, flags, startId);
 		} else if (intent.getAction().equals("ACTION_START_FOREGROUND_SERVICE")) {
@@ -78,6 +77,7 @@ public class ForegroundService extends Service {
 
 		try {
 			this.startReadingLogs();
+			this.startIngestingMetrics();
 		} catch (final Exception ex) {
 			MainActivity.setText(ex.toString());
 		}
@@ -88,7 +88,7 @@ public class ForegroundService extends Service {
 		final InputStream stdout = p.getInputStream();
 		final InputStream stderr = p.getErrorStream();
 
-		final StreamReader outReader = new StreamReader(stdout, new EventListener(MainActivity.logToken));
+		final StreamReader outReader = new StreamReader(stdout, new EventListener(MainActivity.LOG_TOKEN_LOGCAT));
 		final StreamReader errReader = new StreamReader(stderr, new ErrorListener());
 
 		final Thread thout = new Thread(outReader);
@@ -96,6 +96,10 @@ public class ForegroundService extends Service {
 
 		thout.start();
 		therr.start();
+	}
+
+	private void startIngestingMetrics() {
+		new Thread(new MetricsIngestor()).start();
 	}
 
 	private Process exec(final String cmd) throws IOException {

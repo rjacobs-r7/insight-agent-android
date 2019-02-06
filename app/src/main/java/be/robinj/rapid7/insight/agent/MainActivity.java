@@ -24,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String PERMISSION_READ_LOGS = "android.permission.READ_LOGS";
 
-    static final UUID logToken = UUID.fromString("a25faf2d-c591-4258-a151-b31b6858378e");
+	static final UUID LOG_TOKEN_LOGCAT = UUID.fromString("a25faf2d-c591-4258-a151-b31b6858378e");
+	static final UUID LOG_TOKEN_SYSTEM_INFO = UUID.fromString("46d7b77b-a965-4937-89ab-2745d927cbbf");
 
     private static Looper looper;
     private static TextView tvMain;
@@ -40,15 +41,12 @@ public class MainActivity extends AppCompatActivity {
 			looper = this.getMainLooper();
 			tvMain = this.findViewById(R.id.tvMain);
 
-			if (!this.hasReadLogsPermission()) {
-				throw new LogReadPermissionNotGranted();
+			if (! Permission.hasBasicPermissions(this)) {
+				Permission.requestBasicPermissions(this);
+				return;
 			}
 
-			final Intent intent = new Intent(MainActivity.this, ForegroundService.class);
-			intent.setAction("ACTION_START_FOREGROUND_SERVICE");
-			this.startService(intent);
-
-			this.moveTaskToBack(true);
+			this.start();
 		} catch (final Exception ex) {
 			setText(ex.toString());
 			ex.printStackTrace();
@@ -67,5 +65,29 @@ public class MainActivity extends AppCompatActivity {
 				tvMain.setText(str);
 			}
 		});
+	}
+
+	private void start() throws LogReadPermissionNotGranted {
+		if (!this.hasReadLogsPermission()) {
+			throw new LogReadPermissionNotGranted();
+		}
+
+		final Intent intent = new Intent(MainActivity.this, ForegroundService.class);
+		intent.setAction("ACTION_START_FOREGROUND_SERVICE");
+		this.startService(intent);
+
+		this.moveTaskToBack(true);
+	}
+
+	@Override
+	public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+		try {
+			this.start();
+		} catch (final LogReadPermissionNotGranted ex) {
+			ex.printStackTrace();
+			tvMain.setText(ex.toString());
+		}
 	}
 }
