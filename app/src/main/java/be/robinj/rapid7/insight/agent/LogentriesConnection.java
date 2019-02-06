@@ -1,5 +1,7 @@
 package be.robinj.rapid7.insight.agent;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -13,7 +15,7 @@ public class LogentriesConnection {
 
 	private LogentriesConnection() {}
 
-	public static LogentriesConnection getInstance() {
+	public static synchronized LogentriesConnection getInstance() {
 		if (instance == null) {
 			instance = new LogentriesConnection();
 		}
@@ -21,8 +23,9 @@ public class LogentriesConnection {
 		return instance;
 	}
 
-	private void openConnection() throws IOException {
+	private synchronized void openConnection() throws IOException {
 		if (this.socket == null || !this.socket.isConnected() || this.socket.isClosed()) {
+			Log.i("Rapid7Insight", "Opening connection to InsightOps");
 			this.socket = new Socket("data.logentries.com", 10000);
 		}
 	}

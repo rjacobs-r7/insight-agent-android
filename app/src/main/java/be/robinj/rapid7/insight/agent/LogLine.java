@@ -13,8 +13,8 @@ public class LogLine {
 	private static final String LOG_REGEX = "^(\\d{2})\\-(\\d{2})\\s([\\d\\:\\.]+)\\s+([VDIWEFS])\\/([^\\s]*)\\s*\\(\\s*(\\d+)\\s*\\)\\s*\\:\\s*(.*)$";
 	private static final Pattern LOG_PATTERN = Pattern.compile(LOG_REGEX);
 
-	// pid, activity, uid, embryo
-	private static final Pattern START_PROC_PATTERN = Pattern.compile("^Start proc\\s*(\\d+)\\:([^\\/]+)\\/[a-z0-9]+ for embryo ([^\\ ]+)$");
+	// pid, activity, uid, type, thingy
+	private static final Pattern START_PROC_PATTERN = Pattern.compile("^Start proc\\s*(\\d+)\\:([^\\/]+)\\/[a-z0-9]+ for ([^\\s]+) ([^\\ ]+)$");
 	// activity, etc, reason
 	private static final Pattern FORCE_STOP_PATTERN = Pattern.compile("^Force stopping ([^\\s]+) (.+)\\:\\s*([^\\s]+)$");
 	// pid, activity, uid, etc
@@ -57,7 +57,7 @@ public class LogLine {
 
 	// ISO8601 2019-02-06T13:15:37Z
 	private String parseTimestamp(final String month, final String day, final String time) {
-		return (1900 + new Date().getYear()) + "-" + month + "-" + day + "T" + time.split("\\.", 1)[0] + "Z";
+		return (1900 + new Date().getYear()) + "-" + month + "-" + day + "T" + time + "Z";
 	}
 
 	public String getOriginal() {
@@ -118,7 +118,7 @@ public class LogLine {
 			final Matcher startProcMatcher = START_PROC_PATTERN.matcher(this.message);
 			if (startProcMatcher.find()) {
 				// pid, activity, uid, embryo
-				return "action=start_proc pid=" + startProcMatcher.group(1) + " activity=" + startProcMatcher.group(2) + " uid=" + startProcMatcher.group(3) + " embryo=" + startProcMatcher.group(4);
+				return "action=start_proc pid=" + startProcMatcher.group(1) + " activity=" + startProcMatcher.group(2) + " uid=" + startProcMatcher.group(3) + " " + startProcMatcher.group(4) + "=" + startProcMatcher.group(5);
 			}
 
 			final Matcher forceStopMatcher = FORCE_STOP_PATTERN.matcher(this.message);
@@ -141,7 +141,7 @@ public class LogLine {
 
 	@Override
 	public String toString() {
-		if (!this.parsed) {
+		if (!this.isParsed()) {
 			return this.getOriginal();
 		}
 

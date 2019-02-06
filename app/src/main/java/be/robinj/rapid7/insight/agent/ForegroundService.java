@@ -79,6 +79,7 @@ public class ForegroundService extends Service {
 			this.startReadingLogs();
 			this.startIngestingMetrics();
 		} catch (final Exception ex) {
+			ex.printStackTrace();
 			MainActivity.setText(ex.toString());
 		}
 	}

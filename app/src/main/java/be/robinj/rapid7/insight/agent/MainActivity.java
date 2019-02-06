@@ -10,6 +10,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private void start() throws LogReadPermissionNotGranted {
 		if (!this.hasReadLogsPermission()) {
-			throw new LogReadPermissionNotGranted();
+			throw new LogReadPermissionNotGranted("adb shell\npm grant be.robinj.rapid7.insight.agent android.permission.READ_LOGS");
 		}
 
 		final Intent intent = new Intent(MainActivity.this, ForegroundService.class);
@@ -89,5 +90,12 @@ public class MainActivity extends AppCompatActivity {
 			ex.printStackTrace();
 			tvMain.setText(ex.toString());
 		}
+	}
+
+	@Override
+	protected void onResume() {
+    	super.onResume();
+
+		Toast.makeText(this, "Insight Agent is running", Toast.LENGTH_SHORT).show();
 	}
 }
