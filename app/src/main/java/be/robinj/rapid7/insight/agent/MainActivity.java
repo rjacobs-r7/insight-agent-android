@@ -1,5 +1,6 @@
 package be.robinj.rapid7.insight.agent;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String PERMISSION_READ_LOGS = "android.permission.READ_LOGS";
 
-    private static final UUID logToken = UUID.fromString("a25faf2d-c591-4258-a151-b31b6858378e");
+    static final UUID logToken = UUID.fromString("a25faf2d-c591-4258-a151-b31b6858378e");
 
     private static Looper looper;
     private static TextView tvMain;
@@ -43,35 +44,20 @@ public class MainActivity extends AppCompatActivity {
 				throw new LogReadPermissionNotGranted();
 			}
 
-        	this.startReadingLogs();
+			final Intent intent = new Intent(MainActivity.this, ForegroundService.class);
+			intent.setAction("ACTION_START_FOREGROUND_SERVICE");
+			this.startService(intent);
+
+			this.moveTaskToBack(true);
 		} catch (final Exception ex) {
 			setText(ex.toString());
 			ex.printStackTrace();
 		}
     }
 
-    private boolean hasReadLogsPermission() {
-        return this.getPackageManager().checkPermission(PERMISSION_READ_LOGS, this.getPackageName())
-                == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void startReadingLogs() throws IOException {
-		final Process p = this.exec("logcat -v time");
-		final InputStream stdout = p.getInputStream();
-		final InputStream stderr = p.getErrorStream();
-
-		final StreamReader outReader = new StreamReader(stdout, new EventListener(logToken));
-		final StreamReader errReader = new StreamReader(stderr, new ErrorListener());
-
-		final Thread thout = new Thread(outReader);
-		final Thread therr = new Thread(errReader);
-
-		thout.start();
-		therr.start();
-	}
-
-    private Process exec(final String cmd) throws IOException {
-    	return Runtime.getRuntime().exec(cmd);
+	private boolean hasReadLogsPermission() {
+		return this.getPackageManager().checkPermission(PERMISSION_READ_LOGS, this.getPackageName())
+				== PackageManager.PERMISSION_GRANTED;
 	}
 
 	public static void setText(final String str) {
