@@ -50,7 +50,7 @@ public class EventStreamReader implements StreamReader {
 		Observable.interval(5, TimeUnit.SECONDS)
 				.subscribeOn(Schedulers.from(threadPool))
 				.map(x -> connection.retryFailed())
-				.doOnNext(n -> Log.i("Rapid7Insight", "Resent " + n + " batches"))
+				.doOnNext(n -> Log.i("Rapid7Insight", "Re-sent " + n + " batches"))
 				.doOnError(ex -> {
 					Log.e("Rapid7Insight", ex.toString());
 					ex.printStackTrace();
