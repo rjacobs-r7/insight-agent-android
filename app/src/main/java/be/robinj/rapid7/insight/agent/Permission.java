@@ -8,7 +8,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Permission {
 	private final Context context;
@@ -44,22 +46,13 @@ public class Permission {
 	}
 
 	public static boolean hasBasicPermissions(final Context context) {
-		for (final String permission : BASIC_PERMISSIONS) {
-			if (! new Permission(context, permission).check()) {
-				return false;
-			}
-		}
-
-		return true;
+		return ! Arrays.stream(BASIC_PERMISSIONS).anyMatch(permission -> ! new Permission(context, permission).check());
 	}
 
 	public static void requestMultiple(final Activity parent, final String[] permissions) {
-		final List<String> permissionsToRequest = new ArrayList<>();
-		for (final String permission : permissions) {
-			if (! new Permission(parent, permission).check()) {
-				permissionsToRequest.add(permission);
-			}
-		}
+		final List<String> permissionsToRequest = Arrays.stream(permissions)
+				.filter((permission) -> ! new Permission(parent, permission).check())
+				.collect(Collectors.toList());
 
 		if (permissionsToRequest.isEmpty()) {
 			return;

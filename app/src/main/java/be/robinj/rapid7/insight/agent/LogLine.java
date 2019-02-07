@@ -147,4 +147,8 @@ public class LogLine {
 
 		return this.getTimestamp() + " level=" + this.getLevelName() + " tag=" + this.getComponent() + " pid=" + this.getPid() + " " + this.getMessage();
 	}
+
+	public static String tryParse(final String str) {
+		return new LogLine(str).toString();
+	}
 }

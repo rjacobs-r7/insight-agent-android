@@ -6,20 +6,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.UUID;
 
 import be.robinj.rapid7.insight.agent.exception.LogReadPermissionNotGranted;
-import be.robinj.rapid7.insight.agent.listener.ErrorListener;
-import be.robinj.rapid7.insight.agent.listener.EventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,12 +52,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	public static void setText(final String str) {
-    	new Handler(looper).post(new Runnable() {
-			@Override
-			public void run() {
-				tvMain.setText(str);
-			}
-		});
+    	new Handler(looper).post(() -> tvMain.setText(str));
 	}
 
 	private void start() throws LogReadPermissionNotGranted {

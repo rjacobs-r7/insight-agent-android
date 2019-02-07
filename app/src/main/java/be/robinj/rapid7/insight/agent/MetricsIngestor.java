@@ -1,14 +1,14 @@
 package be.robinj.rapid7.insight.agent;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import be.robinj.rapid7.insight.agent.logentries.LogentriesConnection;
 
 public class MetricsIngestor implements Runnable {
 	private static final Pattern PATTERN_CPU_STAT = Pattern.compile("^(cpu\\d*)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)$");

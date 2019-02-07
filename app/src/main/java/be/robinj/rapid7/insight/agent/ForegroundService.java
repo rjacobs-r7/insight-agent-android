@@ -17,8 +17,9 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 
-import be.robinj.rapid7.insight.agent.listener.ErrorListener;
-import be.robinj.rapid7.insight.agent.listener.EventListener;
+import be.robinj.rapid7.insight.agent.streamreader.ErrorStreamReader;
+import be.robinj.rapid7.insight.agent.streamreader.EventStreamReader;
+import be.robinj.rapid7.insight.agent.streamreader.StreamReader;
 
 public class ForegroundService extends Service {
 	@Override
@@ -89,8 +90,8 @@ public class ForegroundService extends Service {
 		final InputStream stdout = p.getInputStream();
 		final InputStream stderr = p.getErrorStream();
 
-		final StreamReader outReader = new StreamReader(stdout, new EventListener(MainActivity.LOG_TOKEN_LOGCAT));
-		final StreamReader errReader = new StreamReader(stderr, new ErrorListener());
+		final StreamReader outReader = new EventStreamReader(stdout, MainActivity.LOG_TOKEN_LOGCAT);
+		final StreamReader errReader = new ErrorStreamReader(stderr);
 
 		final Thread thout = new Thread(outReader);
 		final Thread therr = new Thread(errReader);
